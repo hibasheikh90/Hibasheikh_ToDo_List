@@ -1,31 +1,88 @@
 #! /usr/bin/env node
-
 import inquirer from "inquirer";
-
-let todoList = [];
+let todoList: string [] = [];
 let conditions = true;
-
 console.log("\n \t Welcome to Hibasheikh Todo List Application\n");
 
-while(conditions){
-    let addTask = await inquirer.prompt([
-        {
-            name: "task",
-            type: "input",
-            message: "Enter your New Task:"
+let main = async () => {
+    while(conditions){
+        let option = await inquirer.prompt({
+            name: "choice",
+            type: "list",
+            message: "select an option you want to do ",
+            choices: ["Add Task", "Uptate Task", "Delete Task", "View ToDo List", "Exite"],
+        });
+        if(option.choice === "Add Task"){
+            await addTask()
         }
-    ]);
-    todoList.push(addTask.task);
-    console.log(`${addTask} Task added in Todo list successfully`);
-
-    let addMoreTask = await inquirer.prompt([
-        {
-            name: "addmore",
-            type: "confirm",
-            message: "Do you want more add task ?",
-            default: "False"
+        else if(option.choice === "Delete Task"){
+            await deleteTask()
         }
-    ]);
-    conditions = addMoreTask.addmore
+        else if(option.choice === "Uptate Task"){
+            await updateTask()
+        }
+        else if(option.choice === "View ToDo List"){
+            await viewTask()
+        }
+        else if(option.choice === "Exite"){
+          conditions = false;
+        }
+    }
 }
-console.log("Your Udated Todo List:", todoList);
+
+// function to add new task to the list
+let addTask = async () => {
+  let newTask = await inquirer.prompt([
+    {
+      name: "task",
+      type: "input",
+      message: "Enter your new task :"
+    }
+  ]);
+  todoList.push(newTask.task);
+  console.log(`\n ${newTask.task} task added successfully in todo list`);
+}
+
+//function to view all todo  list tasks
+let viewTask = () => {
+  console.log("\n Your ToDo List: \n");
+  todoList.forEach((task,index) => {
+       console.log(`${index + 1}:${task}`)
+  })
+  
+}
+
+// function to delete a task from the list
+let deleteTask = async () => {
+    await viewTask()
+    let taskIndex = await inquirer.prompt([
+      {
+        name: "index",
+        type: "number",
+        message: "Enter the 'index no.' of the task you want to delete : ",
+      }
+    ]);
+    let deletedTask = todoList.splice(taskIndex.task - 1, 1);
+    console.log(`\n ${deletedTask} this task has been deleted successfully from your ToDo list`);
+}
+// function to update a task
+let updateTask = async () => {      
+    await viewTask()
+    let update_task_index = await inquirer.prompt([
+      {
+         name: "index",
+         type: "number",
+         message: "Enter your 'index no' of the task you want to update :"
+      },
+      {
+        name: "new_task",
+        type: "input",
+        message: "Now Enter new task name :",
+      }
+    ]);
+    todoList[update_task_index.index - 1] = update_task_index.new_task
+    console.log(`\n Task at index no. ${update_task_index.index - 1} updated successfully[For updated list check: "View Todo list"]`)
+}
+
+
+main();
